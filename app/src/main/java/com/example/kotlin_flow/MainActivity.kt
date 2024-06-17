@@ -61,22 +61,25 @@ fun flow(modifier: Modifier , channel: Channel<Int>){
 
 }
 
-fun producer(channel: Channel<Int>){
+fun producer(channel: Channel<Int>) {
     CoroutineScope(Dispatchers.Main).launch {
-        for(i in 1..5){
+        for (i in 1..2) {
             channel.send(i)
+            Log.d("Producer", "Sent: $i")
+             // Send a value every 500ms
+        }
+        channel.close() // Close the channel when done
+    }
+}
+
+fun consumer(channel: Channel<Int>) {
+    CoroutineScope(Dispatchers.Main).launch {
+        delay(3000) // Start consuming after a 2-second delay
+        for (value in channel) {
+            Log.d("Consumer", "Received: $value")
         }
     }
 }
 
-fun consumer(channel: Channel<Int>){
-    CoroutineScope(Dispatchers.Main).launch {
-        for(i in 1..5){
-            delay(1000)
-            val d = channel.receive()
-            Log.d("data" , "Data:$d")
-        }
-    }
-}
 
 
