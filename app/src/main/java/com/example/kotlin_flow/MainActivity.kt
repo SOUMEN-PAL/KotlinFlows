@@ -27,6 +27,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asFlow
@@ -97,16 +98,19 @@ fun flow(modifier: Modifier){
 
 }
 
-fun producer() : MutableSharedFlow<Int> {
-    val mutableSharedFlow = MutableSharedFlow<Int>()
+fun producer(): Flow<Int>{
+    val mutableSharedFlow = MutableSharedFlow<Int>(2)
     GlobalScope.launch {
         val list = listOf(1,2,3,4,5)
         list.forEach{
-            mutableSharedFlow.emit(it)
+            mutableSharedFlow
+                .emit(it)
             delay(1000)
         }
     }
+
     return mutableSharedFlow
+
 }
 
 fun consumer1() {
