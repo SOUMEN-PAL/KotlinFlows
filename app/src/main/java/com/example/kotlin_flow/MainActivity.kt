@@ -49,6 +49,7 @@ import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
+import kotlin.math.log
 
 import kotlin.system.measureTimeMillis
 import androidx.compose.runtime.remember as remember
@@ -98,33 +99,30 @@ fun flow(modifier: Modifier){
 
 }
 
-fun producer(): Flow<Int>{
-    val mutableSharedFlow = MutableSharedFlow<Int>()
+fun producer(): MutableStateFlow<Int>{
+    val mutableStateFlow = MutableStateFlow<Int>(10)
+    val list = listOf(20,30,40)
     GlobalScope.launch {
-        val list = listOf(1,2,3,4,5)
+
         list.forEach{
-            mutableSharedFlow
-                .emit(it)
-            Log.d("emit" ,"Emmiting - $it")
-            delay(1000)
+            mutableStateFlow.emit(it)
+
+            delay(2000)
         }
     }
-
-    return mutableSharedFlow
-
+    return mutableStateFlow
 }
 
 fun consumer1() {
     val job = GlobalScope.launch(Dispatchers.Main) {
 
             val res = producer()
-                delay(6000)
-                res.collect {
-                    Log.d("thread", "Consumer1 ${it}")
-
-                }
-
-
+//                delay(6000)
+//                res.collect {
+//                    Log.d("thread", "Consumer1 ${it}")
+//
+//                }
+            Log.d("value state" , "${res.value}")
     }
 }
 
