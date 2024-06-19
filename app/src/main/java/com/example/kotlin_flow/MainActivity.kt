@@ -1,5 +1,9 @@
 package com.example.kotlin_flow
 
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
 import android.os.Bundle
 import android.util.Log
 
@@ -32,12 +36,17 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.FileOutputStream
+
 import kotlin.system.measureTimeMillis
 import androidx.compose.runtime.remember as remember
 
@@ -74,6 +83,9 @@ fun flow(modifier: Modifier){
 
             producer()
             consumer1()
+
+
+
 
 
         }) {
