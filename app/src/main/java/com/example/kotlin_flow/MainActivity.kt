@@ -17,19 +17,25 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.example.kotlin_flow.ui.theme.Kotlin_flowTheme
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlin.system.measureTimeMillis
 
 
 class MainActivity : ComponentActivity() {
@@ -73,27 +79,32 @@ fun flow(modifier: Modifier){
 }
 
 fun producer() = flow<Int> {
-    val list = listOf(1,2,3,4,5,6,7,8,9,10)
-    list.forEach {
-        delay(1000)
-        emit(it)
-    }
+
+        val list = listOf(1, 2, 3, 4, 5)
+        list.forEach {
+            delay(1000)
+            Log.d("thread", Thread.currentThread().name)
+            emit(it)
+        }
+
+
 }
 
 fun consumer1() {
-    val job = GlobalScope.launch {
+    val job = GlobalScope.launch(Dispatchers.Main) {
         val data = producer()
         val x = data
-            .map {
 
-                it*2
+            .map {
+                delay(1000)
+                it * 2
+                Log.d("map" , Thread.currentThread().name)
             }
-            .filter {
-                it < 8
-            }
+            .flowOn(Dispatchers.IO)
             .collect {
-                Log.d("First data", "$it")
+                Log.d("thread" , Thread.currentThread().name)
             }
+
     }
 }
 
