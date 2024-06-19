@@ -85,6 +85,7 @@ fun producer() = flow<Int> {
             delay(1000)
             Log.d("thread", Thread.currentThread().name)
             emit(it)
+            throw Exception("Error in emitter")
         }
 
 
@@ -92,19 +93,15 @@ fun producer() = flow<Int> {
 
 fun consumer1() {
     val job = GlobalScope.launch(Dispatchers.Main) {
-        val data = producer()
-        val x = data
-
-            .map {
-                delay(1000)
-                it * 2
-                Log.d("map" , Thread.currentThread().name)
-            }
-            .flowOn(Dispatchers.IO)
-            .collect {
-                Log.d("thread" , Thread.currentThread().name)
-            }
-
+        try {
+            producer()
+                .collect {
+                    Log.d("thread", "Consumer thread ${Thread.currentThread().name}")
+                }
+        }
+        catch (e: Exception){
+            Log.d("ezy" , "${e.message}")
+        }
     }
 }
 
