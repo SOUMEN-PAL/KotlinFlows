@@ -85,7 +85,7 @@ fun producer() = flow<Int> {
             delay(1000)
             Log.d("thread", Thread.currentThread().name)
             emit(it)
-            throw Exception("Error in emitter")
+
         }
 
 
@@ -97,6 +97,7 @@ fun consumer1() {
             producer()
                 .collect {
                     Log.d("thread", "Consumer thread ${Thread.currentThread().name}")
+                    throw Exception("Error in collector")
                 }
         }
         catch (e: Exception){
