@@ -14,6 +14,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableIntState
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.example.kotlin_flow.ui.theme.Kotlin_flowTheme
@@ -24,6 +26,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.buffer
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
@@ -36,6 +39,7 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.system.measureTimeMillis
+import androidx.compose.runtime.remember as remember
 
 
 class MainActivity : ComponentActivity() {
@@ -48,6 +52,7 @@ class MainActivity : ComponentActivity() {
             Kotlin_flowTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     flow(modifier = Modifier.padding(innerPadding))
+
                 }
             }
         }
@@ -85,10 +90,13 @@ fun producer() = flow<Int> {
             delay(1000)
             Log.d("thread", Thread.currentThread().name)
             emit(it)
-
+            throw Exception("Error in emiter")
         }
 
-
+}.catch {
+    // exceptions will be log but agar koi callback elements bhi emit kar sakte ha
+    Log.d("error" , "error in Producer ${it.message}")
+    emit(-1)
 }
 
 fun consumer1() {
@@ -97,7 +105,7 @@ fun consumer1() {
             producer()
                 .collect {
                     Log.d("thread", "Consumer thread ${Thread.currentThread().name}")
-                    throw Exception("Error in collector")
+
                 }
         }
         catch (e: Exception){
