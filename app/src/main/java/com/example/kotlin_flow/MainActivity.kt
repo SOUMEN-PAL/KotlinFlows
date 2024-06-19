@@ -74,7 +74,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun flow(modifier: Modifier){
 
-    
+
 
 
     Column(
@@ -84,9 +84,9 @@ fun flow(modifier: Modifier){
     ) {
         Button(onClick = {
 
-            producer()
+
             consumer1()
-            consumer2()
+
 
 
 
@@ -99,12 +99,13 @@ fun flow(modifier: Modifier){
 }
 
 fun producer(): Flow<Int>{
-    val mutableSharedFlow = MutableSharedFlow<Int>(2)
+    val mutableSharedFlow = MutableSharedFlow<Int>()
     GlobalScope.launch {
         val list = listOf(1,2,3,4,5)
         list.forEach{
             mutableSharedFlow
                 .emit(it)
+            Log.d("emit" ,"Emmiting - $it")
             delay(1000)
         }
     }
@@ -117,8 +118,8 @@ fun consumer1() {
     val job = GlobalScope.launch(Dispatchers.Main) {
 
             val res = producer()
-                res
-                .collect {
+                delay(6000)
+                res.collect {
                     Log.d("thread", "Consumer1 ${it}")
 
                 }
@@ -128,17 +129,7 @@ fun consumer1() {
 }
 
 
-fun consumer2(){
-    val job = GlobalScope.launch {
 
-        val result = producer()
-        delay(2500)
-        result
-        .collect{
-            Log.d("thread", "Consumer2 ${it}")
-        }
-    }
-}
 
 
 
