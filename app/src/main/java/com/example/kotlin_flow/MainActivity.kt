@@ -27,11 +27,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
@@ -83,7 +85,7 @@ fun flow(modifier: Modifier){
 
             producer()
             consumer1()
-
+            consumer2()
 
 
 
@@ -95,37 +97,44 @@ fun flow(modifier: Modifier){
 
 }
 
-fun producer() = flow<Int> {
-
-        val list = listOf(1, 2, 3, 4, 5)
-        list.forEach {
+fun producer() : MutableSharedFlow<Int> {
+    val mutableSharedFlow = MutableSharedFlow<Int>()
+    GlobalScope.launch {
+        val list = listOf(1,2,3,4,5)
+        list.forEach{
+            mutableSharedFlow.emit(it)
             delay(1000)
-            Log.d("thread", Thread.currentThread().name)
-            emit(it)
-            throw Exception("Error in emiter")
         }
-
-}.catch {
-    // exceptions will be log but agar koi callback elements bhi emit kar sakte ha
-    Log.d("error" , "error in Producer ${it.message}")
-    emit(-1)
+    }
+    return mutableSharedFlow
 }
 
 fun consumer1() {
     val job = GlobalScope.launch(Dispatchers.Main) {
-        try {
-            producer()
+
+            val res = producer()
+                res
                 .collect {
-                    Log.d("thread", "Consumer thread ${Thread.currentThread().name}")
+                    Log.d("thread", "Consumer1 ${it}")
 
                 }
-        }
-        catch (e: Exception){
-            Log.d("ezy" , "${e.message}")
-        }
+
+
     }
 }
 
+
+fun consumer2(){
+    val job = GlobalScope.launch {
+
+        val result = producer()
+        delay(2500)
+        result
+        .collect{
+            Log.d("thread", "Consumer2 ${it}")
+        }
+    }
+}
 
 
 
