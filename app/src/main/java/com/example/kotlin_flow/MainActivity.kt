@@ -20,8 +20,12 @@ import com.example.kotlin_flow.ui.theme.Kotlin_flowTheme
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
@@ -46,6 +50,9 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun flow(modifier: Modifier){
+
+    
+
 
     Column(
         Modifier.fillMaxSize(),
@@ -76,10 +83,17 @@ fun producer() = flow<Int> {
 fun consumer1() {
     val job = GlobalScope.launch {
         val data = producer()
-        data
-            .collect{
-            Log.d("data" , "Data1: $it")
-        }
+        val x = data
+            .map {
+
+                it*2
+            }
+            .filter {
+                it < 8
+            }
+            .collect {
+                Log.d("First data", "$it")
+            }
     }
 }
 
